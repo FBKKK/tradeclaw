@@ -5,10 +5,10 @@ WORKDIR /app
 # Install pnpm
 RUN corepack enable && corepack prepare pnpm@8 --activate
 
-# Copy package files
+# Copy all monorepo files
 COPY package.json pnpm-lock.yaml ./
-COPY core/package.json ./packages/core/
-COPY server/package.json ./packages/server/
+COPY packages/core/package.json ./packages/core/
+COPY packages/server/package.json ./packages/server/
 
 # Install dependencies
 RUN pnpm install --frozen-lockfile
