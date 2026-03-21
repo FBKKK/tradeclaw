@@ -16,8 +16,9 @@ RUN pnpm install --frozen-lockfile
 # Copy source code
 COPY . .
 
-# Build
-RUN pnpm build --filter=@tradeclaw/core --filter=@tradeclaw/server
+# Build core first, then server
+RUN pnpm --filter @tradeclaw/core build
+RUN pnpm --filter @tradeclaw/server build
 
 # Expose port
 EXPOSE 3000
