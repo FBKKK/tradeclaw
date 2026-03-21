@@ -18,4 +18,4 @@ RUN pnpm install
 EXPOSE 3000
 
 # Run directly with tsx (skip type checking for faster deploy)
-CMD ["pnpm", "exec", "tsx", "--no-warnings", "packages/server/src/index.ts"]
+CMD ["pnpm", "dlx", "tsx", "--no-warnings", "packages/server/src/index.ts"]
