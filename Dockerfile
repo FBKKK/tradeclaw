@@ -11,12 +11,8 @@ COPY . .
 # Install dependencies
 RUN pnpm install
 
-# Build TypeScript
-RUN npx tsc -p packages/core/tsconfig.json
-RUN npx tsc -p packages/server/tsconfig.json
-
 # Expose port
 EXPOSE 3000
 
-# Start
-CMD ["node", "packages/server/dist/index.js"]
+# Run directly with tsx (no build step needed)
+CMD ["pnpm", "exec", "tsx", "packages/server/src/index.ts"]
