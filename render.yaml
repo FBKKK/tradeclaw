@@ -1,0 +1,41 @@
+# Render Blueprint - TradeClaw
+# https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: tradeclaw-api
+    runtime: docker
+    plan: starter
+    region: oregon
+    dockerfilePath: ./packages/server/Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: CORS_ORIGIN
+        fromService:
+          name: tradeclaw-ui
+          type: web
+
+  - type: web
+    name: tradeclaw-ui
+    staticPublishPath: packages/ui/dist
+    buildCommand: cd packages/ui && pnpm install && pnpm build
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: public, max-age=0, must-revalidate
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          name: tradeclaw-api
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL

@@ -35,10 +35,57 @@ tradeclaw/
 │   └── ui/                # React frontend
 ├── schema.sql             # Database schema
 ├── docker-compose.yaml     # PostgreSQL and Redis
-└── railway.json           # Railway deployment config
+├── railway.json          # Railway deployment config
+└── render.yaml           # Render deployment config
 ```
 
-## Quick Start
+## Deployment to Render (Recommended)
+
+### 1. Create Render Account
+Visit https://render.com and sign up with GitHub
+
+### 2. Create PostgreSQL Database
+- New → PostgreSQL
+- Copy the Internal Database URL
+
+### 3. Create Redis Instance
+- New → Redis
+- Copy the Redis URL
+
+### 4. Deploy Backend
+1. New → Web Service
+2. Connect GitHub → Select `FBKKK/tradeclaw`
+3. Settings:
+   - Root Directory: `packages/server`
+   - Build Command: `pnpm install && pnpm build`
+   - Start Command: `node dist/index.js`
+4. Add Environment Variables:
+   ```
+   NODE_ENV=production
+   DATABASE_URL=postgresql://...
+   REDIS_URL=redis://...
+   JWT_SECRET=your-secure-random-string
+   CORS_ORIGIN=https://your-frontend.onrender.com
+   ```
+
+### 5. Deploy Frontend
+1. New → Static Site
+2. Connect GitHub → Select `FBKKK/tradeclaw`
+3. Settings:
+   - Root Directory: `packages/ui`
+   - Build Command: `pnpm install && pnpm build`
+   - Publish Directory: `dist`
+4. Add Environment Variable:
+   ```
+   VITE_API_URL=https://your-backend.onrender.com
+   ```
+
+### 6. Update CORS
+Set `CORS_ORIGIN` in backend to your frontend URL
+
+---
+
+## Local Development
 
 ### Prerequisites
 
@@ -50,6 +97,7 @@ tradeclaw/
 
 1. Clone and install dependencies:
 ```bash
+git clone https://github.com/FBKKK/tradeclaw.git
 cd tradeclaw
 pnpm install
 ```
@@ -62,6 +110,7 @@ docker compose up -d
 3. Copy environment file:
 ```bash
 cp .env.example .env
+# Edit .env with your settings
 ```
 
 4. Start development servers:
@@ -77,63 +126,6 @@ pnpm dev
 | `pnpm build` | Build all packages |
 | `pnpm test` | Run tests |
 | `pnpm typecheck` | TypeScript type checking |
-
-## Deployment
-
-### Railway (Backend) + Vercel (Frontend)
-
-#### 1. Deploy Backend to Railway
-
-```bash
-# Go to railway.app
-# Create new project → Deploy from GitHub
-# Select this repo
-# Railway auto-detects Node.js
-```
-
-Add environment variables in Railway dashboard:
-```
-DATABASE_URL=postgresql://...
-REDIS_URL=redis://...
-JWT_SECRET=your-secure-secret
-CORS_ORIGIN=https://your-frontend.vercel.app
-```
-
-#### 2. Deploy Frontend to Vercel
-
-```bash
-cd packages/ui
-vercel
-```
-
-Set environment variable:
-```
-VITE_API_URL=https://your-railway-app.up.railway.app/api
-```
-
-#### 3. Update CORS
-
-In Railway, set:
-```
-CORS_ORIGIN=https://your-frontend.vercel.app
-```
-
----
-
-### Local Development
-
-```bash
-# Start infrastructure
-docker compose up -d
-
-# Start server
-cd packages/server
-pnpm dev
-
-# Start UI (another terminal)
-cd packages/ui
-pnpm dev
-```
 
 ## Development
 
