@@ -1,9 +1,9 @@
-import { McpServer } from '@modelcontextprotocol/sdk/server'
+import { Server } from '@modelcontextprotocol/sdk/server'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio'
 import { z } from 'zod'
 
 // Initialize MCP server
-const server = new McpServer({
+const server = new Server({
   name: 'TradeClaw MCP Server',
   version: '0.1.0',
 })
