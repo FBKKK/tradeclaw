@@ -1,7 +1,7 @@
 import { Context, Next } from 'hono'
 import { ZodError } from 'zod'
 
-export const errorHandler = async (c: Context, next: Next, err: Error) => {
+export const errorHandler = async (err: Error, c: Context, next: Next) => {
   console.error('Error:', err)
 
   if (err instanceof ZodError) {
