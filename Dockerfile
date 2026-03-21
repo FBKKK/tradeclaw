@@ -3,7 +3,7 @@ FROM node:20-alpine
 WORKDIR /app
 
 # Install pnpm
-RUN corepack enable && corepack prepare pnpm@8 --activate
+RUN corepack enable && corepack prepare pnpm@10 --activate
 
 # Copy all monorepo files
 COPY package.json pnpm-lock.yaml ./
