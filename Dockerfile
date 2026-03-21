@@ -5,23 +5,18 @@ WORKDIR /app
 # Install pnpm
 RUN corepack enable && corepack prepare pnpm@10 --activate
 
-# Copy monorepo files
-COPY package.json pnpm-lock.yaml ./
-COPY packages/core/package.json ./packages/core/
-COPY packages/server/package.json ./packages/server/
+# Copy all files
+COPY . .
 
 # Install dependencies
 RUN pnpm install
 
-# Copy source code
-COPY . .
-
-# Build packages
-RUN pnpm --filter @tradeclaw/core build
-RUN pnpm --filter @tradeclaw/server build
+# Build TypeScript
+RUN npx tsc -p packages/core/tsconfig.json
+RUN npx tsc -p packages/server/tsconfig.json
 
 # Expose port
 EXPOSE 3000
 
-# Start command
+# Start
 CMD ["node", "packages/server/dist/index.js"]
