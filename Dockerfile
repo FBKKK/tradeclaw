@@ -5,18 +5,18 @@ WORKDIR /app
 # Install pnpm
 RUN corepack enable && corepack prepare pnpm@10 --activate
 
-# Copy all monorepo files
+# Copy monorepo files
 COPY package.json pnpm-lock.yaml ./
 COPY packages/core/package.json ./packages/core/
 COPY packages/server/package.json ./packages/server/
 
 # Install dependencies
-RUN pnpm install --frozen-lockfile
+RUN pnpm install
 
 # Copy source code
 COPY . .
 
-# Build core first, then server
+# Build packages
 RUN pnpm --filter @tradeclaw/core build
 RUN pnpm --filter @tradeclaw/server build
 
