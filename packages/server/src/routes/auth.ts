@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 import { hash, compare } from '@node-rs/bcrypt'
-import { sign, verify } from 'jsonwebtoken'
+import jwt from 'jsonwebtoken'
+const { sign, verify } = jwt
 import { v4 as uuid } from 'uuid'
 import { UserCreateSchema } from '@tradeclaw/core'
 
