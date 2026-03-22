@@ -1,7 +1,7 @@
-import { Context, Next } from 'hono'
+import { Context } from 'hono'
 import { ZodError } from 'zod'
 
-export const errorHandler = async (err: Error, c: Context, next: Next) => {
+export const errorHandler = async (err: Error, c: Context) => {
   console.error('Error:', err)
 
   if (err instanceof ZodError) {

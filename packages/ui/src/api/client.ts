@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_URL || 'https://tradeclaw-api.onrender.com/api'
+const API_BASE = import.meta.env.VITE_API_URL || '/api'
 
 interface ApiOptions {
   method?: 'GET' | 'POST' | 'PATCH' | 'DELETE'
@@ -226,6 +226,23 @@ class ApiClient {
 
   async getExchanges() {
     return this.request('/market/exchanges')
+  }
+
+  // Chat endpoints - returns raw response for SSE streaming
+  async chatStream(message: string, history?: Array<{ role: string; content: string }>): Promise<Response> {
+    const token = this.getToken()
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    }
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`
+    }
+
+    return fetch(`${this.baseUrl}/chat/stream`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ message, history }),
+    })
   }
 }
 

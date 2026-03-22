@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useToast } from '../components/Toast'
+import api from '../api/client'
 
 type AuthMode = 'login' | 'register'
 
@@ -39,29 +40,14 @@ export function AuthPage() {
         }
       }
 
-      const endpoint = mode === 'login' ? '/api/auth/login' : '/api/auth/register'
-      const body = mode === 'login'
-        ? { email: formData.email, password: formData.password }
-        : { email: formData.email, password: formData.password }
-
-      const res = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      })
-
-      const data = await res.json()
-
-      if (!res.ok || !data.success) {
-        showError(data.error || '操作失败')
-        setLoading(false)
-        return
-      }
+      const data = mode === 'login'
+        ? await api.login(formData.email, formData.password)
+        : await api.register(formData.email, formData.password)
 
       // Store tokens
-      localStorage.setItem('accessToken', data.data.accessToken)
-      localStorage.setItem('refreshToken', data.data.refreshToken)
-      localStorage.setItem('user', JSON.stringify(data.data.user))
+      localStorage.setItem('accessToken', data.accessToken)
+      localStorage.setItem('refreshToken', data.refreshToken)
+      localStorage.setItem('user', JSON.stringify(data.user))
 
       success(mode === 'login' ? '登录成功' : '注册成功')
 
@@ -72,8 +58,9 @@ export function AuthPage() {
       } else {
         navigate('/')
       }
-    } catch (err) {
-      showError('网络错误，请稍后重试')
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : '网络错误，请稍后重试'
+      showError(message)
     } finally {
       setLoading(false)
     }

@@ -1,24 +1,51 @@
 import { useState, useRef, useEffect } from 'react'
+import ReactMarkdown from 'react-markdown'
 import { PageHeader } from '../components/PageHeader'
+import { useChat } from '../hooks/useChat'
 
-interface Message {
-  id: string
-  role: 'user' | 'assistant'
-  content: string
-  timestamp: Date
+function ToolCallDisplay({ toolCall }: { toolCall: { name: string; input: Record<string, unknown>; result?: unknown } }) {
+  const [expanded, setExpanded] = useState(false)
+
+  return (
+    <div className="mt-2 border border-border/50 rounded-lg overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setExpanded(!expanded)}
+        className="w-full px-3 py-2 bg-bg-primary/50 flex items-center justify-between text-xs hover:bg-bg-primary transition-colors"
+      >
+        <span className="flex items-center gap-2">
+          <span className="text-accent">⚡</span>
+          <span className="text-text-muted font-mono">{toolCall.name}</span>
+        </span>
+        <span className="text-text-muted">{expanded ? '▲' : '▼'}</span>
+      </button>
+      {expanded && (
+        <div className="p-3 bg-bg-primary/30 text-xs">
+          <div className="mb-2">
+            <span className="text-text-muted">Input:</span>
+            <pre className="mt-1 p-2 bg-bg-secondary rounded text-text overflow-x-auto">
+              {JSON.stringify(toolCall.input, null, 2)}
+            </pre>
+          </div>
+          {toolCall.result ? (
+            <div>
+              <span className="text-text-muted">Result:</span>
+              <pre className="mt-1 p-2 bg-bg-secondary rounded text-text overflow-x-auto max-h-48 overflow-y-auto">
+                {typeof toolCall.result === 'string'
+                  ? toolCall.result
+                  : JSON.stringify(toolCall.result, null, 2)}
+              </pre>
+            </div>
+          ) : null}
+        </div>
+      )}
+    </div>
+  )
 }
 
 export function ChatPage() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      role: 'assistant',
-      content: '欢迎使用 TradeClaw！我是您的交易助手。我可以帮助您：\n\n- 查询市场价格和K线数据\n- 创建和管理交易策略\n- 设置价格预警通知\n- 生成交易报告\n\n有什么我可以帮您的吗？',
-      timestamp: new Date(),
-    },
-  ])
+  const { messages, isLoading, sendMessage } = useChat()
   const [input, setInput] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -29,39 +56,18 @@ export function ChatPage() {
     e.preventDefault()
     if (!input.trim() || isLoading) return
 
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      role: 'user',
-      content: input.trim(),
-      timestamp: new Date(),
-    }
-
-    setMessages((prev) => [...prev, userMessage])
+    const userMessage = input.trim()
     setInput('')
-    setIsLoading(true)
-
-    // Simulated AI response
-    setTimeout(() => {
-      const responses = [
-        '我已经了解了您的请求。让我为您查询相关信息...',
-        '根据当前市场数据，我会为您分析这个交易机会。',
-        '您的策略已创建成功。我会持续监控市场动态。',
-        '目前没有发现符合条件的机会。市场正在盘整。',
-      ]
-      const randomResponse = responses[Math.floor(Math.random() * responses.length)]
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: (Date.now() + 1).toString(),
-          role: 'assistant',
-          content: randomResponse,
-          timestamp: new Date(),
-        },
-      ])
-      setIsLoading(false)
-    }, 1500)
+    await sendMessage(userMessage)
   }
+
+  // Example prompts for quick start
+  const examplePrompts = [
+    '查询 BTC 当前价格',
+    '查询全球市场总览',
+    '查看热门板块',
+    '创建价格预警',
+  ]
 
   return (
     <div className="flex-1 flex flex-col min-h-0">
@@ -71,6 +77,26 @@ export function ChatPage() {
       />
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {messages.length === 0 && (
+          <div className="flex flex-col justify-center items-center h-full text-text-muted">
+            <div className="text-center max-w-md">
+              <p className="text-sm mb-4">发送消息开始对话</p>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                {examplePrompts.map((prompt) => (
+                  <button
+                    key={prompt}
+                    type="button"
+                    onClick={() => setInput(prompt)}
+                    className="px-3 py-2 bg-bg-secondary/50 border border-border/50 rounded-lg hover:bg-bg-secondary hover:border-border transition-colors text-left"
+                  >
+                    {prompt}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
         {messages.map((message) => (
           <div
             key={message.id}
@@ -83,19 +109,38 @@ export function ChatPage() {
                   : 'bg-bg-secondary border border-border text-text rounded-bl-md'
               }`}
             >
-              <div className="text-sm whitespace-pre-wrap">{message.content}</div>
+              <div className="text-sm markdown-content">
+                <ReactMarkdown>{message.content}</ReactMarkdown>
+              </div>
+
+              {/* Tool calls display for assistant messages */}
+              {message.role === 'assistant' && message.toolCalls && message.toolCalls.length > 0 && (
+                <div className="mt-3 space-y-2">
+                  <div className="text-[10px] text-text-muted uppercase tracking-wider">
+                    Tool Calls ({message.toolCalls.length})
+                  </div>
+                  {message.toolCalls.map((toolCall) => (
+                    <ToolCallDisplay key={toolCall.id} toolCall={toolCall} />
+                  ))}
+                </div>
+              )}
+
               <div
                 className={`text-[10px] mt-1 ${
                   message.role === 'user' ? 'text-white/60' : 'text-text-muted'
                 }`}
               >
-                {message.timestamp.toLocaleTimeString()}
+                {message.isStreaming ? (
+                  <span className="animate-pulse">输入中...</span>
+                ) : (
+                  message.timestamp.toLocaleTimeString()
+                )}
               </div>
             </div>
           </div>
         ))}
 
-        {isLoading && (
+        {isLoading && messages[messages.length - 1]?.role !== 'assistant' && (
           <div className="flex justify-start message-enter">
             <div className="bg-bg-secondary border border-border rounded-2xl rounded-bl-md px-4 py-3">
               <div className="flex gap-1">

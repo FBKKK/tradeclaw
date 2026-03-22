@@ -85,6 +85,12 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'tradeclaw-auth',
+      onRehydrateStorage: () => (state) => {
+        // After rehydration, set isLoading to false since we have persisted auth state
+        if (state) {
+          state.isLoading = false
+        }
+      },
       partialize: (state) => ({
         user: state.user,
         accessToken: state.accessToken,

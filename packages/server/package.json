@@ -14,26 +14,28 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@tradeclaw/core": "workspace:*",
+    "@anthropic-ai/sdk": "0.80.0",
     "@hono/node-server": "^1.8.0",
-    "hono": "^4.0.0",
     "@node-rs/bcrypt": "^1.10.0",
+    "@tradeclaw/agent": "workspace:*",
+    "@tradeclaw/core": "workspace:*",
+    "dotenv": "^16.4.1",
+    "drizzle-orm": "^0.29.3",
+    "hono": "^4.0.0",
+    "ioredis": "^5.3.2",
     "jsonwebtoken": "^9.0.2",
-    "zod": "^3.22.4",
-    "uuid": "^9.0.1",
+    "pg": "^8.11.3",
     "pino": "^8.18.0",
     "pino-pretty": "^10.3.0",
-    "ioredis": "^5.3.2",
-    "pg": "^8.11.3",
-    "drizzle-orm": "^0.29.3",
-    "dotenv": "^16.4.1"
+    "uuid": "^9.0.1",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.5",
     "@types/pg": "^8.11.0",
     "@types/uuid": "^9.0.7",
-    "typescript": "^5.3.3",
+    "drizzle-kit": "^0.20.12",
     "tsx": "^4.7.0",
-    "drizzle-kit": "^0.20.12"
+    "typescript": "^5.3.3"
   }
 }

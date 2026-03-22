@@ -1,8 +1,13 @@
 {
   "version": 2,
-  "buildCommand": "cd packages/ui && pnpm install --ignore-scripts && pnpm build",
+  "buildCommand": "pnpm --filter @tradeclaw/ui build",
   "outputDirectory": "packages/ui/dist",
-  "env": {
-    "VITE_API_URL": "https://tradeclaw-api.onrender.com/api"
-  }
+  "build": {
+    "env": {
+      "VITE_API_URL": "https://tradeclaw-api.onrender.com/api"
+    }
+  },
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }

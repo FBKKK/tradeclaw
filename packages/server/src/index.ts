@@ -10,6 +10,7 @@ import { alertRoutes } from './routes/alerts.js'
 import { tradeRoutes } from './routes/trades.js'
 import { reportRoutes } from './routes/reports.js'
 import { marketRoutes } from './routes/market.js'
+import { chatRoutes } from './routes/chat.js'
 import { errorHandler } from './middleware/error.js'
 import { authMiddleware } from './middleware/auth.js'
 
@@ -33,6 +34,7 @@ app.route('/api/alerts', alertRoutes)
 app.route('/api/trades', tradeRoutes)
 app.route('/api/reports', reportRoutes)
 app.route('/api/market', marketRoutes)
+app.route('/api/chat', chatRoutes)
 
 // Protected routes (require auth)
 app.use('/api/*', authMiddleware)

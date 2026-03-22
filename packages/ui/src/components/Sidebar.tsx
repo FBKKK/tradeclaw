@@ -1,6 +1,7 @@
 import { type ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import type { Page } from '../App'
+import { ROUTES } from '../App'
 
 interface SidebarProps {
   sseConnected: boolean

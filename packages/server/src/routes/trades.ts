@@ -142,6 +142,7 @@ tradeRoutes.post('/', async (c) => {
       status: 'submitted',
       simulation: validated.simulation ?? true,
       createdAt: new Date(),
+      filledAt: undefined as Date | undefined,
     }
 
     trades.set(trade.id, trade)

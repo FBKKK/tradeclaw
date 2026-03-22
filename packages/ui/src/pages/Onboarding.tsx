@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useToast } from '../components/Toast'
+import api from '../api/client'
 
 interface OnboardingAnswers {
   tradingExperience: string
@@ -142,17 +143,7 @@ export function OnboardingPage() {
       localStorage.setItem('onboardingCompleted', 'true')
 
       // Save user preferences to API
-      const token = localStorage.getItem('accessToken')
-      if (token) {
-        await fetch('/api/users/me', {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ preferences: answers }),
-        }).catch(() => {})
-      }
+      await api.updateUser({ preferences: answers }).catch(() => {})
 
       success('设置完成！')
       navigate('/')
@@ -311,34 +302,15 @@ export function OnboardingPage() {
           )}
 
           {/* Navigation */}
-          <div className="flex items-center justify-between mt-8">
+          <div className="flex items-center justify-end gap-4 mt-8">
             <button
               type="button"
-              onClick={currentStep === 0 ? () => navigate('/') : handleBack}
-              className="px-4 py-2 text-sm text-text-muted hover:text-text transition-colors"
+              onClick={handleComplete}
+              disabled={completing}
+              className="px-6 py-2 bg-accent text-white text-sm font-medium rounded-xl hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {currentStep === 0 ? '跳过' : '返回'}
+              {completing ? '完成中...' : '完成设置'}
             </button>
-
-            {currentStep < STEPS.length - 1 ? (
-              <button
-                type="button"
-                onClick={handleNext}
-                disabled={!canProceed()}
-                className="px-6 py-2 bg-accent text-white text-sm font-medium rounded-xl hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                下一步
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={handleComplete}
-                disabled={completing}
-                className="px-6 py-2 bg-accent text-white text-sm font-medium rounded-xl hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                {completing ? '完成中...' : '完成设置'}
-              </button>
-            )}
           </div>
         </div>
       </div>
