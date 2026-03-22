@@ -2,10 +2,7 @@
   "version": 2,
   "buildCommand": "cd packages/ui && pnpm install && pnpm build",
   "outputDirectory": "packages/ui/dist",
-  "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/:splat" }
-  ],
   "env": {
-    "VITE_API_URL": "@tradeclaw-api-url"
+    "VITE_API_URL": "https://tradeclaw-api.onrender.com/api"
   }
 }
