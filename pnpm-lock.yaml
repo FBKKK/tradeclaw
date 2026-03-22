@@ -152,9 +152,6 @@ importers:
 
   packages/ui:
     dependencies:
-      '@tradeclaw/core':
-        specifier: workspace:*
-        version: link:../core
       clsx:
         specifier: ^2.1.0
         version: 2.1.1
