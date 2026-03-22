@@ -69,11 +69,15 @@ export const useAuthStore = create<AuthState>()(
         }
 
         try {
-          const user = JSON.parse(userStr)
-          // Verify token with server
+          const controller = new AbortController()
+          const timeoutId = setTimeout(() => controller.abort(), 10000) // 10s timeout
+
           const res = await fetch('/api/users/me', {
             headers: { Authorization: `Bearer ${token}` },
+            signal: controller.signal,
           })
+
+          clearTimeout(timeoutId)
 
           if (res.ok) {
             const data = await res.json()
@@ -86,12 +90,12 @@ export const useAuthStore = create<AuthState>()(
             })
             return true
           } else {
-            // Token expired or invalid
-            get().logout()
+            set({ isLoading: false, isAuthenticated: false })
             return false
           }
-        } catch {
-          get().logout()
+        } catch (err) {
+          console.error('checkAuth error:', err)
+          set({ isLoading: false, isAuthenticated: false })
           return false
         }
       },
