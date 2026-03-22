@@ -59,7 +59,6 @@ export const useAuthStore = create<AuthState>()(
       },
 
       checkAuth: async () => {
-        set({ isLoading: true })
         const token = localStorage.getItem('accessToken')
         const userStr = localStorage.getItem('user')
 
@@ -69,32 +68,16 @@ export const useAuthStore = create<AuthState>()(
         }
 
         try {
-          const controller = new AbortController()
-          const timeoutId = setTimeout(() => controller.abort(), 10000) // 10s timeout
-
-          const res = await fetch('/api/users/me', {
-            headers: { Authorization: `Bearer ${token}` },
-            signal: controller.signal,
+          const user = JSON.parse(userStr)
+          set({
+            user,
+            accessToken: token,
+            refreshToken: localStorage.getItem('refreshToken'),
+            isAuthenticated: true,
+            isLoading: false,
           })
-
-          clearTimeout(timeoutId)
-
-          if (res.ok) {
-            const data = await res.json()
-            set({
-              user: data.data,
-              accessToken: token,
-              refreshToken: localStorage.getItem('refreshToken'),
-              isAuthenticated: true,
-              isLoading: false,
-            })
-            return true
-          } else {
-            set({ isLoading: false, isAuthenticated: false })
-            return false
-          }
-        } catch (err) {
-          console.error('checkAuth error:', err)
+          return true
+        } catch {
           set({ isLoading: false, isAuthenticated: false })
           return false
         }
